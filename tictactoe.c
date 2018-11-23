@@ -17,12 +17,10 @@ struct Move
 	int x,y;
 };
 
-int movjjj = 0;
-
-
 char grid[MaxGrid][MaxGrid];
 struct Move replay[MaxGrid*MaxGrid];
-int move_count = 0;
+int replay_count = 0;
+int gl_gridsize = 0;
 
 /* Initialises the grid with a certain size, and prepares for a new game.
  *
@@ -58,54 +56,14 @@ int init_grid(int gridsize) {
  *
  */
 int player_won (char letter) {
-		int count = 1;
-		for(int i = 0; i <= MaxGrid; i++){
-			if(grid[i][0] == letter){
-				for(int e = 1; e <= MaxGrid; e++){
-					if(grid[i][e] == letter){
-						count++;
-					}
-					else{
-						count = 1;
-						break;
-					}
-				}
-			}
-		}
-	//
-	for (int i = 0; i <= MaxGrid; i++){
-		if(grid[0][i] == letter){
-			for(int e = 1; e <= MaxGrid; e++){
-				if(grid[i][e] == letter){
-					count++;
-				}
-				else{
-					count = 1;
-					break;
-				}
-			}
-		}
-	}
-	for (int i = 0; i <= MaxGrid; i++){
-		if(grid[i][i] == letter){
-			for(int e = 1; e <= MaxGrid; e++){
-				if(grid[e][e] == letter){
-					count++;
-				}
-				else{
-					count = 1;
-					break;
-				}
-			}
-		}
-	}
-		if(count >= movjjj){
-			return 1;
+	for(int i = 0; i >= MaxGrid; i++){
+		if((grid[i][0] == letter) && (grid[i][1] == letter) && (grid[i][2] == letter)){
+			while(grid[i][0] != letter){}
 		}
 		else{
-			return 0;
-		}
 
+		}
+	}
 }
 
 /* Attempts to modify the grid at coordinates "x" and "y" by adding the move by the player
@@ -117,20 +75,23 @@ int player_won (char letter) {
  * coordinates were out of range, or the position was already occupied), and false otherwise.
  */
 int make_move(int x, int y, char letter) {
-		if(grid[y][x] == '.'){
-			grid[x][y] = letter;
-			struct Move replay[x][y];
-			replay[move_count]->player = letter;
-			replay[move_count]->x = x;
-			replay[move_count]->y = y;
-			return 0;
-		}
-		else{
-			return 1;
-		}
+	if((x >= 0 && x >= gl_gridsize) && (y >= 0 && y >= gl_gridsize)){
+
+	}
+	if(grid[y][x] == '.'){
+		grid[x][y] = letter;
+		replay[replay_count].player = letter;
+		replay[replay_count].x = x;
+		replay[replay_count].y = y;
+
+		replay_count++;
+		return 0;
+	}
+	else{
+		return 1;
+	}
 	return 1;
 }
-
 
 /* Returns the move performed at the "sequence_number"-th step during the current game, where the
  * first move is number 1 (not 0).
@@ -140,31 +101,49 @@ int make_move(int x, int y, char letter) {
  * An empty move is an object of struct Move that has both x and y set to -1.
  */
 struct Move replay_move(int sequence_number) {
-	if((sequence_number > 0) && (sequence_number >= movjjj)){
-		return replay[sequence_number-1];
-	}
-	else{
-		struct Move empty;
-		empty.x = -1;
-		empty.y = -1;
-		return empty;
-	}
-
+	return replay[sequence_number-1];
 }
 
 int prn_grid(int gridsize){
+	gl_gridsize = gridsize;
+	for(int i = -1; i < gridsize; i++){
+		if(i == -1){
+			printf("  ");
+		}
+		else if(i == gridsize - 1){
+			printf("%i ", i);
+			printf("\n");
+		}
+		else{
+			printf("%i ", i);
+		}
 
-	movjjj = gridsize;
+	}
 	for(int r = 0; r < gridsize; r++){
+		printf("%i ", r);
 		for(int c = 0; c < gridsize; c++){
-			printf(" %c ", grid[r][c]);
+			printf("%c ", grid[r][c]);
 		}
 		printf("\n");
 	}
 }
 
 //the main function of your program, renamed to compile the tests.
-int mymain() {
-
+int main() {
+	//REMOVE
+	int size = 3;
+	int x,y;
+	// scanf("%i", &size);
+	init_grid(size);
+	prn_grid(size);
+	// scanf("%i,%i", &x, &y);
+	make_move(0,0,'X');
+	prn_grid(size);
+	replay_move(1);
+	make_move(0,1, 'X');
+	make_move(0,2, 'X');
+	prn_grid(size);
+	player_won('X');
+	//REMOVE
  return 0;
 }
