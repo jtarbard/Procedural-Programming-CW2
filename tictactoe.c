@@ -21,7 +21,7 @@ char grid[MaxGrid][MaxGrid];
 struct Move replay[MaxGrid*MaxGrid];
 int replay_count = 0;
 int gridlimit = 0;
-	int iter = 0;//temp
+int iter = 0;//temp
 /* Initialises the grid with a certain size, and prepares for a new game.
  *
  * Sets all the cells of the gridsize x gridsize portion of the grid to '.'.
@@ -30,7 +30,7 @@ int gridlimit = 0;
  * Returns true if the input is invalid, and false otherwise.
  */
 int init_grid(int gridsize) {
-	gridlimit = gridsize; //assign global variable
+	// gridlimit = gridsize; //assign global variable
 
 	if((gridsize >= 3) && (gridsize <= MaxGrid)){
 		for(int r = 0; r < gridsize; ++r){
@@ -145,7 +145,6 @@ int player_won(char letter) {
 			// printf("theres three in a row...");
 			// loop till end of grid
 			for(int j = gridlimit-3; j >= 0; j++){
-				iter++;
 				// printf("%i,%i...", j, gridlimit-j-1);
 				// printf("last loop...");
 				//if letter is a match and it is last playable square
@@ -179,8 +178,7 @@ int player_won(char letter) {
 int make_move(int x, int y, char letter) {
 	if(((x >= 0 && x < gridlimit) && (y >= 0 && y < gridlimit) && (grid[x][y] == '.'))){
 		grid[x][y] = letter;
-		replay[replay_count]
-		.player = letter;
+		replay[replay_count].player = letter;
 		replay[replay_count].x = x;
 		replay[replay_count].y = y;
 
@@ -227,27 +225,55 @@ int prn_grid(int gridsize){
 }
 
 //the main function of your program, renamed to compile the tests.
-int mymain() {
-	// //REMOVE
-	// int size = 10;
-	// int x,y;
-	// // scanf("%i", &size);
-	// init_grid(size);
-	// prn_grid(size);
-	// // scanf("%i,%i", &x, &y);
-	// make_move(0,3,'X');
-	// make_move(1,3,'X');
-	// make_move(2,3,'X');
-	// make_move(3,3,'X');
-	// make_move(4,3,'X');
-	// make_move(5,3,'X');
-	// make_move(6,3,'X');
-	// make_move(7,3,'X');
-	// make_move(8,3,'X');
-	// make_move(9,3,'X');
-	// prn_grid(size);
-	// player_won('X');
-	// printf("%i", iter);
-	//REMOVE
+int main() {
+	int won = 0;
+	char player = 'O';
+	int x, y, v;
+	do{
+		printf("TicTacToe Grid Size (3 to 10): ");
+		scanf("%i", &gridlimit);
+		if((gridlimit < 3) || (gridlimit > MaxGrid)){
+			printf("Input Invalid: Grid Limit Out of Range\n");
+		}
+	}while((gridlimit < 3) || (gridlimit > MaxGrid));
+
+	init_grid(gridlimit);
+
+	do{
+		if(player == 'O'){
+			player = 'X';
+		}
+		else{
+			player = 'O';
+		}
+
+		prn_grid(gridlimit);
+
+
+		do{
+			printf("Player %c, Choose Location (x,y): ", player);
+			scanf("%i,%i", &y, &x);
+
+			if(make_move(x, y, player) == 1){
+				v = 0;
+				if(x > gridlimit-1 || y > gridlimit-1){
+					printf("Input Invalid: Grid Location Out of Range\n");
+				}
+				else if (grid[x][y] != '.'){
+					printf("Input Invalid: Space Taken\n");
+				}
+			}//if end
+			else{
+				v = 1;
+			}
+		}while(v != 1);
+
+		won = player_won(player);
+		if(won == 1){
+			prn_grid(gridlimit);
+			printf("\n+--------------+\n| Player %c Won |\n+--------------+\n\n", player);
+		}
+	}
+	while(won == 0);
  return 0;
 }
