@@ -17,7 +17,7 @@ struct Move
 	int x,y;
 };
 
-char grid[MaxGrid+1][MaxGrid+1]; //increment by one for edges to be '\0'
+char grid[MaxGrid][MaxGrid];
 struct Move replay[MaxGrid*MaxGrid];
 int replay_count = 0;
 int gridlimit = 0;
@@ -57,42 +57,25 @@ int init_grid(int gridsize) {
  * Clarity and *Efficiency* section of the marking scheme).
  *
  */
-int horizontal(char letter) {
-
-}
-
-int vertical(char letter) {
-
-}
-
-int diagonal(char letter) {
-
-}
 
 int player_won(char letter) {
 	iter = 0;
-	printf("%i", iter);
+	// printf("%i", iter);
 
 	//HORIZONTAL
 	//Loop through rows
 	for(int i = 0; i <= gridlimit; i++){
 		iter++;
-		printf("looping...");
-		//if theres three in a row
 		if((grid[i][0] == letter) && (grid[i][1] == letter) && (grid[i][2] == letter)){
-			printf("theres three in a row...");
-			//loop till end of grid
-			for(int j = 3; j <= gridlimit; j++){
+
+			for(int j = 2; j <= gridlimit; j++){
 				iter++;
-				printf("last loop...");
-				//if letter is a match and it is last playable square
-				if(grid[i][j] == letter && grid[i][j+1] == '\0'){
-					printf("WINNER...");
+
+				if(grid[i][j] == letter && j+1 == gridlimit){
 					return 1;
 				}
 				//else if grid does not equal letter
 				else if(grid[i][j] != letter){
-					printf("BREAK...");
 					break;
 				}
 				else{
@@ -107,22 +90,18 @@ int player_won(char letter) {
 	//VERTICAL
 	for(int i = 0; i <= gridlimit; i++){
 		iter++;
-		printf("looping...");
 		//if theres three in a row
 		if((grid[0][i] == letter) && (grid[1][i] == letter) && (grid[2][i] == letter)){
-			printf("theres three in a row...");
 			//loop till end of grid
-			for(int j = 3; j <= gridlimit; j++){
+			for(int j = 2; j <= gridlimit; j++){
 				iter++;
-				printf("last loop...");
+				// printf("last loop...");
 				//if letter is a match and it is last playable square
-				if(grid[j][i] == letter && grid[j+1][i] == '\0'){
-					printf("WINNER...");
+				if(grid[j][i] == letter && j+1 == gridlimit){
 					return 1;
 				}
 				//else if grid does not equal letter
 				else if(grid[j][i] != letter){
-					printf("BREAK...");
 					break;
 				}
 				else{
@@ -138,19 +117,17 @@ int player_won(char letter) {
 		//tl to br
 		//if theres three in a row
 		if((grid[0][0] == letter) && (grid[1][1] == letter) && (grid[2][2] == letter)){
-			printf("theres three in a row...");
+			// printf("theres three in a row...");
 			//loop till end of grid
 			for(int j = 2; j <= gridlimit; j++){
 				iter++;
-				printf("last loop...");
+				// printf("last loop...");
 				//if letter is a match and it is last playable square
-				if(grid[j][j] == letter && grid[j+1][j+1] == '\0'){
-					printf("WINNER...");
+				if(grid[j][j] == letter && j+1 == gridlimit){
 					return 1;
 				}
 				//else if grid does not equal letter
 				else if(grid[j][j] != letter){
-					printf("BREAK...");
 					break;
 				}
 				else{
@@ -158,8 +135,35 @@ int player_won(char letter) {
 				}
 			}
 		}
-		else{
+	else {
+
 		}
+	//DIAGONAL
+		//tr to bl
+		//if theres three in a row
+		if((grid[gridlimit-1][0] == letter) && (grid[gridlimit-2][1] == letter) && (grid[gridlimit-3][2] == letter)){
+			// printf("theres three in a row...");
+			// loop till end of grid
+			for(int j = gridlimit-3; j >= 0; j++){
+				iter++;
+				// printf("%i,%i...", j, gridlimit-j-1);
+				// printf("last loop...");
+				//if letter is a match and it is last playable square
+				if(grid[j][gridlimit-j-1] == letter && j-1 == 0){
+					// printf("%i,D2:WINNER", gridlimit);
+					return 1;
+				}
+				//else if grid does not equal letter
+				else if(grid[j][gridlimit-j-1] != letter){
+					break;
+				}
+				else{
+					//loop
+				}
+			}
+		}
+	else{
+	}
 
 	return 0;
 }
@@ -173,23 +177,20 @@ int player_won(char letter) {
  * coordinates were out of range, or the position was already occupied), and false otherwise.
  */
 int make_move(int x, int y, char letter) {
-	if((x >= 0 && x >= gridlimit) && (y >= 0 && y >= gridlimit)){
-
-	}
-	if(grid[y][x] == '.'){
+	if(((x >= 0 && x < gridlimit) && (y >= 0 && y < gridlimit) && (grid[x][y] == '.'))){
 		grid[x][y] = letter;
-		replay[replay_count].player = letter;
+		replay[replay_count]
+		.player = letter;
 		replay[replay_count].x = x;
 		replay[replay_count].y = y;
 
-		replay_count++;
 		return 0;
 	}
 	else{
 		return 1;
 	}
-	return 1;
 }
+
 
 /* Returns the move performed at the "sequence_number"-th step during the current game, where the
  * first move is number 1 (not 0).
@@ -205,7 +206,7 @@ struct Move replay_move(int sequence_number) {
 int prn_grid(int gridsize){
 	for(int i = -1; i < gridsize; i++){
 		if(i == -1){
-			printf("  ");
+			 printf("  ");
 		}
 		else if(i == gridsize - 1){
 			printf("%i ", i);
@@ -226,29 +227,27 @@ int prn_grid(int gridsize){
 }
 
 //the main function of your program, renamed to compile the tests.
-int main() {
-	//REMOVE
-	int size = 10;
-	int x,y;
-	// scanf("%i", &size);
-	init_grid(size);
-	prn_grid(size);
-	// scanf("%i,%i", &x, &y);
-	make_move(0,0,'X');
-	prn_grid(size);
-	replay_move(1);
-	make_move(1,0, 'X');
-	make_move(2,0, 'X');
-	make_move(3,0, 'X');
-	make_move(4,0, 'X');
-	make_move(5,0, 'X');
-	make_move(6,0, 'X');
-	make_move(7,0, 'X');
-	make_move(8,0, 'X');
-	make_move(9,0, 'X');
-	prn_grid(size);
-	player_won('X');
-	printf("%i", iter);
+int mymain() {
+	// //REMOVE
+	// int size = 10;
+	// int x,y;
+	// // scanf("%i", &size);
+	// init_grid(size);
+	// prn_grid(size);
+	// // scanf("%i,%i", &x, &y);
+	// make_move(0,3,'X');
+	// make_move(1,3,'X');
+	// make_move(2,3,'X');
+	// make_move(3,3,'X');
+	// make_move(4,3,'X');
+	// make_move(5,3,'X');
+	// make_move(6,3,'X');
+	// make_move(7,3,'X');
+	// make_move(8,3,'X');
+	// make_move(9,3,'X');
+	// prn_grid(size);
+	// player_won('X');
+	// printf("%i", iter);
 	//REMOVE
  return 0;
 }
