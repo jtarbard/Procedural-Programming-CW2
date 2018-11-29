@@ -21,7 +21,6 @@ char grid[MaxGrid][MaxGrid];
 struct Move replay[MaxGrid*MaxGrid];
 int replay_count = 0;
 int gridlimit = 0;
-int iter = 0;//temp
 /* Initialises the grid with a certain size, and prepares for a new game.
  *
  * Sets all the cells of the gridsize x gridsize portion of the grid to '.'.
@@ -59,15 +58,29 @@ int init_grid(int gridsize) {
  */
 
 int columns(char letter) {
-	for(int i = 0; i <= gridlimit; i++){
-		iter++;
+	for(int i = 0; i < gridlimit; i++){
 		//if theres three in a row
-		if((grid[0][i] == letter) && (grid[1][i] == letter) && (grid[2][i] == letter)){
-			//loop till end of grid
-			for(int j = 2; j <= gridlimit; j++){
-				iter++;
-				// printf("last loop...");
+//		if((grid[0][i] == letter) && (grid[1][i] == letter) && (grid[2][i] == letter)){
+			for(int j = 0; j < gridlimit; j++){
 				//if letter is a match and it is last playable square
+				if(grid[i][j] == letter && j+1 == gridlimit){
+					return 1;
+				}
+				//else if grid does not equal letter
+				else if(grid[i][j] != letter){
+					break;
+				}
+//				else{
+					//loop
+				}
+			}
+			return 0;
+		}
+
+int rows(char letter) {
+	//Loop through rows
+	for(int i = 0; i <= gridlimit; i++){
+			for(int j = 0; j <= gridlimit; j++){
 				if(grid[j][i] == letter && j+1 == gridlimit){
 					return 1;
 				}
@@ -80,36 +93,7 @@ int columns(char letter) {
 				}
 			}
 		}
-		else{
-		}
 	}
-}
-
-int rows(char letter) {
-	//Loop through rows
-	for(int i = 0; i <= gridlimit; i++){
-		iter++;
-		if((grid[i][0] == letter) && (grid[i][1] == letter) && (grid[i][2] == letter)){
-
-			for(int j = 2; j <= gridlimit; j++){
-				iter++;
-
-				if(grid[i][j] == letter && j+1 == gridlimit){
-					return 1;
-				}
-				//else if grid does not equal letter
-				else if(grid[i][j] != letter){
-					break;
-				}
-				else{
-					//loop
-				}
-			}
-		}
-		else{
-		}
-	}
-}
 
 int diagonal_lt(char letter) {
 	//if theres three in a row
@@ -117,7 +101,6 @@ int diagonal_lt(char letter) {
 		// printf("theres three in a row...");
 		//loop till end of grid
 		for(int j = 2; j <= gridlimit; j++){
-			iter++;
 			// printf("last loop...");
 			//if letter is a match and it is last playable square
 			if(grid[j][j] == letter && j+1 == gridlimit){
@@ -133,21 +116,17 @@ int diagonal_lt(char letter) {
 		}
 	}
 else {
-
+	return 0;
 	}
 }
 
 int diagonal_rt(char letter) {
 	//if theres three in a row
-	if((grid[gridlimit-1][0] == letter) && (grid[gridlimit-2][1] == letter) && (grid[gridlimit-3][2] == letter)){
-		// printf("theres three in a row...");
-		// loop till end of grid
-		for(int j = gridlimit-3; j >= 0; j++){
-			// printf("%i,%i...", j, gridlimit-j-1);
-			// printf("last loop...");
+	if((grid[0][gridlimit-1] == letter) && (grid[1][gridlimit-2] == letter) && (grid[2][gridlimit-3] == letter)){
+		//loop till end of grid
+		for(int j = 0; j <= gridlimit; ++j){
 			//if letter is a match and it is last playable square
-			if(grid[j][gridlimit-j-1] == letter && j-1 == 0){
-				// printf("%i,D2:WINNER", gridlimit);
+			if(grid[j][gridlimit-j-1] == letter && j+1 == gridlimit){
 				return 1;
 			}
 			//else if grid does not equal letter
@@ -159,26 +138,14 @@ int diagonal_rt(char letter) {
 			}
 		}
 	}
-else{
-}
-
-return 0;
+else {
+	return 0;
+	}
 }
 
 int player_won(char letter) {
-	iter = 0;
-	// printf("%i", iter);
 
-	if(columns(letter) == 1){
-		return 1;
-	}
-	else if(rows(letter) == 1){
-		return 1;
-	}
-	else if(diagonal_lt(letter) == 1){
-		return 1;
-	}
-	else if(diagonal_rt(letter) == 1){
+	if(columns(letter) == 1 || rows(letter) == 1 || diagonal_lt(letter) == 1 || diagonal_rt(letter) == 1){
 		return 1;
 	}
 	else{
@@ -287,13 +254,13 @@ int mymain() {
 				v = 1;
 			}
 		}while(v != 1);
-
+		replay_count++;
 		won = player_won(player);
 		if(won == 1){
 			prn_grid(gridlimit);
 			printf("\n+--------------+\n| Player %c Won |\n+--------------+\n\n", player);
 		}
 	}
-	while(won == 0);
+	while(won == 0 || replay_count == gridlimit*gridlimit);
  return 0;
 }
