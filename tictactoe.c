@@ -18,7 +18,7 @@ struct Move
 };
 
 char grid[MaxGrid][MaxGrid];
-struct Move replay[MaxGrid*MaxGrid];
+struct Move moves[MaxGrid*MaxGrid];
 int replay_count = 0;
 int gridlimit = 0;
 /* Initialises the grid with a certain size, and prepares for a new game.
@@ -164,11 +164,10 @@ int player_won(char letter) {
 int make_move(int x, int y, char letter) {
 	if(((x >= 0 && x < gridlimit) && (y >= 0 && y < gridlimit) && (grid[x][y] == '.'))){
 		grid[x][y] = letter;
-		replay[replay_count]
-		.player = letter;
-		replay[replay_count].x = x;
-		replay[replay_count].y = y;
-
+		moves[replay_count].x = x;
+		moves[replay_count].y = y;
+		moves[replay_count].player = letter;
+		// printf("%i, %i, %c\n", moves[replay_count].x,moves[replay_count].y,moves[replay_count].player);
 		return 0;
 	}
 	else{
@@ -185,7 +184,8 @@ int make_move(int x, int y, char letter) {
  * An empty move is an object of struct Move that has both x and y set to -1.
  */
 struct Move replay_move(int sequence_number) {
-	return replay[sequence_number-1];
+	// printf("SN: %i, SN-1: %i", sequence_number, sequence_number -1);
+	return moves[sequence_number-1];
 }
 
 int prn_grid(int gridsize){
@@ -211,56 +211,83 @@ int prn_grid(int gridsize){
 	}
 }
 
-//the main function of your program, renamed to compile the tests.
-int mymain() {
-	int won = 0;
-	char player = 'O';
-	int x, y, v;
-	do{
-		printf("TicTacToe Grid Size (3 to 10): ");
-		scanf("%i", &gridlimit);
-		if((gridlimit < 3) || (gridlimit > MaxGrid)){
-			printf("Input Invalid: Grid Limit Out of Range\n");
-		}
-	}while((gridlimit < 3) || (gridlimit > MaxGrid));
-
-	init_grid(gridlimit);
-
-	do{
-		if(player == 'O'){
-			player = 'X';
-		}
-		else{
-			player = 'O';
-		}
-
-		prn_grid(gridlimit);
-
-
-		do{
-			printf("Player %c, Choose Location (x,y): ", player);
-			scanf("%i,%i", &y, &x);
-
-			if(make_move(x, y, player) == 1){
-				v = 0;
-				if(x > gridlimit-1 || y > gridlimit-1){
-					printf("Input Invalid: Grid Location Out of Range\n");
-				}
-				else if (grid[x][y] != '.'){
-					printf("Input Invalid: Space Taken\n");
-				}
-			}//if end
-			else{
-				v = 1;
+int grid_full(){
+	for(int a = 0; a < gridlimit; a++){
+		for(int b = 0; b < gridlimit; b++){
+			if(grid[a][b] == '.'){
+				return 0;
 			}
-		}while(v != 1);
-		replay_count++;
-		won = player_won(player);
-		if(won == 1){
-			prn_grid(gridlimit);
-			printf("\n+--------------+\n| Player %c Won |\n+--------------+\n\n", player);
+			else{
+				//pass
+			}
 		}
 	}
-	while(won == 0 || replay_count == gridlimit*gridlimit);
+	return 1;
+}
+
+//the main function of your program, renamed to compile the tests.
+int mymain() {
+	char end = 0;
+	while(end == 0){
+		int won = 0;
+		int full = 0;
+		char player = 'O';
+		int x, y, v;
+		do{
+			printf("TicTacToe Grid Size (3 to 10): ");
+			scanf("%i", &gridlimit);
+			if((gridlimit < 3) || (gridlimit > MaxGrid)){
+				printf("Input Invalid: Grid Limit Out of Range\n");
+			}
+		}while((gridlimit < 3) || (gridlimit > MaxGrid));
+
+		init_grid(gridlimit);
+
+		do{
+			if(player == 'O'){
+				player = 'X';
+			}
+			else{
+				player = 'O';
+			}
+
+			prn_grid(gridlimit);
+
+
+			do{
+				printf("Player %c, Choose Location (x,y): ", player);
+				scanf("%i,%i", &y, &x);
+
+				if(make_move(x, y, player) == 1){
+					v = 0;
+					if(x > gridlimit-1 || y > gridlimit-1){
+						printf("Input Invalid: Grid Location Out of Range\n");
+					}
+					else if (grid[x][y] != '.'){
+						printf("Input Invalid: Space Taken\n");
+					}
+				}//if end
+				else{
+					v = 1;
+				}
+			}while(v != 1);
+			replay_count++;
+			printf("\nreplay_count: %i\n", replay_count);
+			won = player_won(player);
+			if(won == 1){
+				prn_grid(gridlimit);
+				printf("\n+--------------+\n| Player %c Won |\n+--------------+\n", player);
+			}
+			full = grid_full();
+			if(full == 1){
+				prn_grid(gridlimit);
+				printf("\n+--------------+\n| No One Won :( |\n+--------------+\n", player);
+			}
+		}
+		while(won == 0 && full == 0);
+		printf("\nPress 0 to Continue and 1 to Exit: ");
+		scanf("%i", &end);
+		printf("\n");
+	}
  return 0;
 }
