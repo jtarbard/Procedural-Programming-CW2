@@ -17,10 +17,10 @@ struct Move
 	int x,y;
 };
 
-char grid[MaxGrid][MaxGrid];
-struct Move moves[MaxGrid*MaxGrid];
-int replay_count = 0;
-int gridlimit = 0;
+char grid[MaxGrid][MaxGrid]; //game grid array
+struct Move moves[MaxGrid*MaxGrid]; //move struct array
+int replay_count = 0; //move count
+int gridlimit = 0; //grid size container
 /* Initialises the grid with a certain size, and prepares for a new game.
  *
  * Sets all the cells of the gridsize x gridsize portion of the grid to '.'.
@@ -31,10 +31,11 @@ int gridlimit = 0;
 int init_grid(int gridsize) {
 	gridlimit = gridsize; //assign global variable
 
+	//if grid size valid
 	if((gridsize >= 3) && (gridsize <= MaxGrid)){
-		for(int r = 0; r < gridsize; ++r){
-			for(int c = 0; c < gridsize; ++c){
-				grid[r][c] = '.';
+		for(int r = 0; r < gridsize; ++r){ //for row in grid
+			for(int c = 0; c < gridsize; ++c){ //for column in grid
+				grid[r][c] = '.'; //set grid location
 			}
 		}
 		return 0;
@@ -59,8 +60,7 @@ int init_grid(int gridsize) {
 
 int columns(char letter) {
 	for(int i = 0; i < gridlimit; i++){
-		//if theres three in a row
-//		if((grid[0][i] == letter) && (grid[1][i] == letter) && (grid[2][i] == letter)){
+		//if theres three in a column
 			for(int j = 0; j < gridlimit; j++){
 				//if letter is a match and it is last playable square
 				if(grid[i][j] == letter && j+1 == gridlimit){
@@ -70,17 +70,19 @@ int columns(char letter) {
 				else if(grid[i][j] != letter){
 					break;
 				}
-//				else{
+				else{
 					//loop
 				}
 			}
-			return 0;
 		}
+	}
 
 int rows(char letter) {
 	//Loop through rows
 	for(int i = 0; i <= gridlimit; i++){
+			//if theres three in a column
 			for(int j = 0; j <= gridlimit; j++){
+				//if letter is a match and it is last playable square
 				if(grid[j][i] == letter && j+1 == gridlimit){
 					return 1;
 				}
@@ -98,7 +100,6 @@ int rows(char letter) {
 int diagonal_lt(char letter) {
 	//if theres three in a row
 	if((grid[0][0] == letter) && (grid[1][1] == letter) && (grid[2][2] == letter)){
-		// printf("theres three in a row...");
 		//loop till end of grid
 		for(int j = 2; j <= gridlimit; j++){
 			// printf("last loop...");
@@ -144,11 +145,11 @@ else {
 }
 
 int player_won(char letter) {
-
+	//if any win check returns true
 	if(columns(letter) == 1 || rows(letter) == 1 || diagonal_lt(letter) == 1 || diagonal_rt(letter) == 1){
 		return 1;
 	}
-	else{
+	else{ //none returned true
 		return 0;
 	}
 }
@@ -162,12 +163,13 @@ int player_won(char letter) {
  * coordinates were out of range, or the position was already occupied), and false otherwise.
  */
 int make_move(int x, int y, char letter) {
+	//if move within grid limits and grid space isnt taken
 	if(((x >= 0 && x < gridlimit) && (y >= 0 && y < gridlimit) && (grid[x][y] == '.'))){
-		grid[x][y] = letter;
+		grid[x][y] = letter; //assign move
+		//store move in struct array
 		moves[replay_count].x = x;
 		moves[replay_count].y = y;
 		moves[replay_count].player = letter;
-		// printf("%i, %i, %c\n", moves[replay_count].x,moves[replay_count].y,moves[replay_count].player);
 		return 0;
 	}
 	else{
@@ -184,27 +186,27 @@ int make_move(int x, int y, char letter) {
  * An empty move is an object of struct Move that has both x and y set to -1.
  */
 struct Move replay_move(int sequence_number) {
-	// printf("SN: %i, SN-1: %i", sequence_number, sequence_number -1);
-	return moves[sequence_number-1];
+	return moves[sequence_number-1]; //return the struct
 }
 
 int prn_grid(int gridsize){
-	for(int i = -1; i < gridsize; i++){
+	//print grid
+	for(int i = -1; i < gridsize; i++){ //add white space
 		if(i == -1){
 			 printf("  ");
 		}
-		else if(i == gridsize - 1){
+		else if(i == gridsize - 1){ //add axis index
 			printf("%i ", i);
 			printf("\n");
 		}
-		else{
+		else{ // add axis index
 			printf("%i ", i);
 		}
 
 	}
-	for(int r = 0; r < gridsize; r++){
+	for(int r = 0; r < gridsize; r++){//print grid axis
 		printf("%i ", r);
-		for(int c = 0; c < gridsize; c++){
+		for(int c = 0; c < gridsize; c++){//print grid dots
 			printf("%c ", grid[r][c]);
 		}
 		printf("\n");
@@ -212,6 +214,7 @@ int prn_grid(int gridsize){
 }
 
 int grid_full(){
+	//check if grid is full
 	for(int a = 0; a < gridlimit; a++){
 		for(int b = 0; b < gridlimit; b++){
 			if(grid[a][b] == '.'){
@@ -226,23 +229,27 @@ int grid_full(){
 }
 
 //the main function of your program, renamed to compile the tests.
-int mymain() {
-	char end = 0;
+int main() {
+	char end = 0; //end condition monitor
 	while(end == 0){
+		//initalise variables
 		int won = 0;
 		int full = 0;
 		char player = 'O';
 		int x, y, v;
+		//initalise grid
 		do{
+			//grt grid size
 			printf("TicTacToe Grid Size (3 to 10): ");
 			scanf("%i", &gridlimit);
+			//if grid invalid
 			if((gridlimit < 3) || (gridlimit > MaxGrid)){
 				printf("Input Invalid: Grid Limit Out of Range\n");
 			}
 		}while((gridlimit < 3) || (gridlimit > MaxGrid));
-
+		//intialise grid
 		init_grid(gridlimit);
-
+		//set player turn
 		do{
 			if(player == 'O'){
 				player = 'X';
@@ -250,16 +257,16 @@ int mymain() {
 			else{
 				player = 'O';
 			}
-
+			//print grid
 			prn_grid(gridlimit);
 
-
+			//make move
 			do{
 				printf("Player %c, Choose Location (x,y): ", player);
 				scanf("%i,%i", &y, &x);
 
 				if(make_move(x, y, player) == 1){
-					v = 0;
+					v = 0; //conetinue condition
 					if(x > gridlimit-1 || y > gridlimit-1){
 						printf("Input Invalid: Grid Location Out of Range\n");
 					}
@@ -268,23 +275,25 @@ int mymain() {
 					}
 				}//if end
 				else{
-					v = 1;
+					v = 1; //fail condition
 				}
 			}while(v != 1);
-			replay_count++;
-			printf("\nreplay_count: %i\n", replay_count);
+
+			replay_count++; //increment move count
+			//check for win
 			won = player_won(player);
 			if(won == 1){
 				prn_grid(gridlimit);
 				printf("\n+--------------+\n| Player %c Won |\n+--------------+\n", player);
 			}
+			//check for full grid
 			full = grid_full();
 			if(full == 1){
 				prn_grid(gridlimit);
 				printf("\n+--------------+\n| No One Won :( |\n+--------------+\n", player);
 			}
-		}
-		while(won == 0 && full == 0);
+		}while(won == 0 && full == 0);
+		//new game query
 		printf("\nPress 0 to Continue and 1 to Exit: ");
 		scanf("%i", &end);
 		printf("\n");
